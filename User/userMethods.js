@@ -14,59 +14,46 @@ async function changebalance(req) {
     var userId = body._id;
     var command = body.command;
     console.log(body);
-    await collection.findOne({ '_id': ObjectID(userId) }, (err, user) => {
-        if (command.title == "outcome") {
-            user.outcome.push({ 'lender': command.lender, 'amount': command.amount, takendate: Date(), hasGiven: false })
-            collection.updateOne({ '_id': ObjectID(userId) },
-                {
-                    '$set': { outcome: user.outcome }
-                }
-            )
-            console.log("simdu ");
-            return ({ message: "outcome has been added" })
-        }
-        if (command.title == "income") {
-            user.income.push({ "debitor": command.debitor, 'amount': command.amount, 'date': Date(), hasGiven: false })
-            return { message: "income has been added" }
-        }
-        if (command.title == "home") {
-            var home_id = command.homeId
-            var productname = command.productname;
-            var amount = command.amount
-            var buyerId = command.buyerId
-            var debitors = command.debitors
-            if (buyerId == userId) {
-                user.alinanlar.push({ "home": homeId, "product": productname, "amount": amount, "debitors": debitors })
-                for (let i = 0; i < debitors.length; i++) {
-                    collection.findOne({ "_id": ObjectID(debitors[i]) }, (err, user) => {
-                        user.alinacaklar.push({ "home": homeId, "product": productname, "amount": amount / (debitors.length + 1), debitors: debitors })
-                        collection.updateOne({ '_id': userId },
-                            {
-                                '$set': { outcome: user.outcome, income: user.income, alinanlar: user.alinanlar, alinacaklar: user.alinacaklar }
-                            }
-                        )
+    var message = ['error', 404]
+    var user = await collection.findOne({ '_id': ObjectID(userId) })
 
-                    })
-                }
-                return { message: "the product you buy has added" }
 
-            }
-            else {
+    if (command.title == "outcome") {
+        user.outcome.push({ 'lender': command.lender, 'amount': command.amount, takendate: Date(), hasGiven: false })
+        message = ['success', 200]
+    }
+    if (command.title == "income") {
+        user.income.push({ "debitor": command.debitor, 'amount': command.amount, 'date': Date(), hasGiven: false })
+        message = ["success", 200]
+    }
+    // TODO: add home object setting
+    if (command.title == "home") {
+        var homeId = command.homeId
+        var productname = command.productname;
+        var amount = command.amount
+        var debitors = command.debitors
+        user.alinanlar.push({ "home": homeId, "product": productname, "amount": amount, "debitors": debitors })
+        for (let i = 0; i < debitors.length; i++) {
+            collection.findOne({ "_id": ObjectID(debitors[i]) }, (err, user) => {
                 user.alinacaklar.push({ "home": homeId, "product": productname, "amount": amount / (debitors.length + 1), debitors: debitors })
-                return { message: "the product other buy has added" }
+                collection.updateOne({ '_id': ObjectID(debitors[i]) },
+                    {
+                        '$set': { outcome: user.outcome, income: user.income, alinanlar: user.alinanlar, alinacaklar: user.alinacaklar }
+                    }
+                )
 
-            }
-
-
+            })
         }
-        collection.updateOne({ '_id': userId },
-            {
-                '$set': { outcome: user.outcome, income: user.income, alinanlar: user.alinanlar, alinacaklar: user.alinacaklar }
-            }
-        )
+        message = ["success", 200]
+    }
 
-    })
-    return { message: "sth has gone wrong" }
+    collection.updateOne({ '_id': ObjectID(userId) },
+    {
+        '$set': { outcome: user.outcome, income: user.income, alinanlar: user.alinanlar, alinacaklar: user.alinacaklar }
+    }
+    )
+    
+    return { message: message }
 
 }
 async function homesettings(req, database) {
