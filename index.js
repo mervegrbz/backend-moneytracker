@@ -2,7 +2,7 @@ var database
 console.log("Connecting to DB")
 const MongoClient = require("mongodb").MongoClient
 
-const MongoURL = 'mongodb://localhost:27017';
+const MongoURL = 'mongodb://35.214.92.199:27017';
 const client = new MongoClient(MongoURL, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
