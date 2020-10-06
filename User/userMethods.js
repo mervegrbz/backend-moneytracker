@@ -2,7 +2,8 @@ const mongo = require('mongodb');
 const ObjectID = mongo.ObjectID
 
 
-async function getbalances(req) {
+async function uploadimage(req) {
+    
     var userID = req.params.id;
 
 

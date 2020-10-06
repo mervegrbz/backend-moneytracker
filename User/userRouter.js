@@ -1,5 +1,6 @@
 const express = require('express')
 const userRouter = express.Router()
+const homeRouter=express.Router()
 const account = require('./Account')
 const options = require('./userMethods')
 const mongo = require('mongodb')
@@ -25,7 +26,10 @@ userRouter.post('/changebalance', async (req, res) => {
     console.log("burada");
     res.json(await options.changebalance(req))
 })
-userRouter.post('./homesetting', async (req, res) => {
-    res.json(options.homesetting(req, database))
+userRouter.post("/getuser", async (req, res) => {
+    console.log(req);
+    res.json(await account.getUser(req))
 })
+
+
 module.exports = userRouter

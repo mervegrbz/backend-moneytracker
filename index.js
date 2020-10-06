@@ -22,10 +22,10 @@ app.listen(8080, () => {
 })
 
 var userRouter = require("./User/userRouter")
-// const homeRouter=require("./Home/homeRouter.js")
+const homeRouter=require("./Home/homeRouter.js")
 // const productRouter=require("./Product/productRouter.js")
 app.use("/user", userRouter)
-// app.use("/home",homeRouter)
+app.use("/home",homeRouter)
 // app.use("/product",productRouter)
 
 module.exports = { database: database, }
